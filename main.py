@@ -1,14 +1,23 @@
 import requests
 from dotenv import load_dotenv
 import os
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from . import database, models
+
+app =  FastAPI()
 
 # load env variables
 load_dotenv()
 api_key = os.getenv("API_KEY")
 
-r = requests.get(f'https://api.nasa.gov/neo/rest/v1/feed?start_date=2015-09-07&end_date=2015-09-08&api_key={api_key}')
 
-print(r.json())
+@app.get("/test")
+def testing():
+    return {"test": "success"}
+# r = requests.get(f'https://api.nasa.gov/neo/rest/v1/feed?start_date=2015-09-07&end_date=2015-09-08&api_key={api_key}')
+
+# print(r.json())
 
 '''
             {
