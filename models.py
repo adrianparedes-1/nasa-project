@@ -8,6 +8,7 @@ class Base(DeclarativeBase):
 class Neo(Base):
     __tablename__ = 'asteroid'
     id = mapped_column(Integer, primary_key=True)
+    name = mapped_column(Text, nullable=False)
     size = mapped_column(Integer, ForeignKey('neo_size.id'))
     hazardous = mapped_column(Boolean, nullable=False)
     close_approach_data = mapped_column(Integer, ForeignKey('approach_data.id'))

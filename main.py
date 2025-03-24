@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import os
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from . import database, models
+from . import database, models, schemas
 
 app =  FastAPI()
 
