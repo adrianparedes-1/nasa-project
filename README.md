@@ -77,9 +77,9 @@ nasa-api-project/
 │   ├── main.py              # FastAPI app entry point
 │   ├── models.py            # SQLAlchemy models
 │   ├── schemas.py           # Pydantic schemas
+|   ├── requirements.txt     # Packages
 │   └── database.py          # DB connection setup 
 │
-├── requirements.txt
 └── README.md
 ```
 
@@ -87,8 +87,9 @@ nasa-api-project/
 
 ## 🔗 Example Endpoints
 
-- `/asteroids?start_date=2024-01-01&end_date=2024-01-07`
 - `/asteroid/{id}`
+- `/asteroids`
+- `/asteroids/date_range`
 
 ---
 
