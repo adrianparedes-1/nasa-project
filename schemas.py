@@ -39,19 +39,14 @@ class NeoSize(IgnoreExtraBase):
     miles: DiameterMi
     feet: DiameterF
     
-class NeoCount(IgnoreExtraBase):
-    count: int
-    
 class Neo(IgnoreExtraBase):
     id: int
     name: str
     estimated_diameter: NeoSize
     is_potentially_hazardous_asteroid: bool
-    close_approach_data: List[ApproachData] 
+    close_approach_data: List[ApproachData] # close approach data is a list of ApproachData models
     
     
 class NeoMetaData(IgnoreExtraBase):
     element_count: int
-    near_earth_objects: Dict[str, List[Neo]]
-    
-    # {hello: neo, hi: neo, gm: neo}
+    near_earth_objects: Dict[str, List[Neo]] # str for dynamic date and list for Neo objects
