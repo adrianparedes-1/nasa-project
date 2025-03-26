@@ -23,16 +23,16 @@ class ApproachData(IgnoreExtraBase):
     
 class DiameterF(IgnoreExtraBase):
     estimated_diameter_min: float
-    estimated_dimater_max: float
+    estimated_diameter_max: float
 class DiameterMi(IgnoreExtraBase):
     estimated_diameter_min: float
-    estimated_dimater_max: float
+    estimated_diameter_max: float
 class DiameterM(IgnoreExtraBase):
     estimated_diameter_min: float
-    estimated_dimater_max: float
+    estimated_diameter_max: float
 class DiameterKil(IgnoreExtraBase):
     estimated_diameter_min: float
-    estimated_dimater_max: float
+    estimated_diameter_max: float
 class NeoSize(IgnoreExtraBase):
     kilometers: DiameterKil
     meters: DiameterM
@@ -47,9 +47,11 @@ class Neo(IgnoreExtraBase):
     name: str
     estimated_diameter: NeoSize
     is_potentially_hazardous_asteroid: bool
-    close_approach_data: ApproachData 
+    close_approach_data: List[ApproachData] 
     
     
 class NeoMetaData(IgnoreExtraBase):
     element_count: int
     near_earth_objects: Dict[str, List[Neo]]
+    
+    # {hello: neo, hi: neo, gm: neo}
