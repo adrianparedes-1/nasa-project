@@ -1,6 +1,3 @@
-Awesome — here’s a polished version of your `README.md` with GitHub-style badges, project structure, and overall improved formatting:
-
-```markdown
 # 🚀 NASA Near-Earth Objects Project
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green)](https://fastapi.tiangolo.com/)
@@ -74,15 +71,13 @@ Visit the interactive Swagger docs:
 ## 📁 Project Structure
 
 ```
-nasa-project/
+nasa-api-project/
 │
-├── app/
+├── nasa-project/
 │   ├── main.py              # FastAPI app entry point
 │   ├── models.py            # SQLAlchemy models
 │   ├── schemas.py           # Pydantic schemas
-│   ├── database.py          # DB connection setup
-│   └── services/
-│       └── nasa_api.py      # Service layer for NASA API
+│   └── database.py          # DB connection setup 
 │
 ├── requirements.txt
 └── README.md
@@ -107,6 +102,3 @@ nasa-project/
 ## 📄 License
 
 This project is licensed under the MIT License.
-```
-
-Let me know if you also want a sample `.env.example`, Docker setup, or SQL migrations section added!
