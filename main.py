@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 from fastapi import FastAPI, Depends, status, HTTPException
 from sqlalchemy.orm import Session
-from . import database, models, schemas
+from schemas import NeoMetaData, BrowseNeos, Neo
 
 app =  FastAPI()
 
@@ -30,13 +30,13 @@ def testing():
 
     print(r.status_code)  # check for any issues
     
-    # print(schemas.NeoMetaData.model_validate(r.json()))
+    # print(NeoMetaData.model_validate(r.json()))
     
     # single asteroid
-    # return schemas.Neo.model_validate(r.json())
+    # return Neo.model_validate(r.json())
     
     #all asteroids
-    return schemas.NeoMetaData.model_validate(r.json())
+    return NeoMetaData.model_validate(r.json())
 
 
 # Get all NEOs
@@ -55,7 +55,7 @@ def get_asteroids():
         if r.status_code == 400:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
-    return schemas.BrowseNeos.model_validate(r.json())
+    return BrowseNeos.model_validate(r.json())
 
 
 # Get all NEOs within a date range
@@ -74,7 +74,7 @@ def get_asteroids():
         if r.status_code == 400:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Bad Request -- please enter a valid date range and try again.")
 
-    return schemas.NeoMetaData.model_validate(r.json())
+    return NeoMetaData.model_validate(r.json())
     
 
 # Get an individual NEO
@@ -87,7 +87,7 @@ def get_individual_asteroid(id: int):
     except requests.exceptions.HTTPError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
         
-    return schemas.Neo.model_validate(r.json())
+    return Neo.model_validate(r.json())
 
 
 '''
