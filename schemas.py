@@ -60,3 +60,6 @@ class NeoPages(IgnoreExtraBase):
 class BrowseNeos(IgnoreExtraBase):
     page: NeoPages
     near_earth_objects: List[Neo] # list of Neo objects
+    
+class UserInput(IgnoreExtraBase):
+    endpoint: Url

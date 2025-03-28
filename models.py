@@ -1,9 +1,18 @@
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, Text
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, Text, func, sql
 from sqlalchemy.orm import DeclarativeBase, mapped_column
 
 class Base(DeclarativeBase):
     pass
 
+
+class SaveSearch(Base):
+    __tablename__ = 'search_history'
+    id = mapped_column(Integer, primary_key=True)
+    url = mapped_column(Text, nullable=False)
+    # asteroid_name = mapped_column(Text)
+    # date_range = mapped_column(DateTime)
+    created_at = mapped_column(DateTime(timezone=True), server_default=func.now())
+    
 class NeoMetaData(Base):
     __tablename__ = 'metadata'
     id = mapped_column(Integer, primary_key=True)
@@ -19,6 +28,8 @@ class Neo(Base):
     size = mapped_column(Integer, ForeignKey('neo_size.id'))
     hazardous = mapped_column(Boolean, nullable=False)
     close_approach_data = mapped_column(Integer, ForeignKey('approach_data.id'))
+    created_at = mapped_column(DateTime(timezone=True), onupdate=sql.func.now())
+
     
 
 class Neo_Size(Base):

@@ -5,6 +5,8 @@ import os
 from fastapi import FastAPI, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from schemas import NeoMetaData, BrowseNeos, Neo
+from models import SaveSearch
+from database import get_db
 
 app =  FastAPI()
 
@@ -12,8 +14,9 @@ app =  FastAPI()
 load_dotenv()
 api_key = os.getenv("API_KEY")
 
+
 @app.get("/test")
-def testing():
+def testing(db: Session =  Depends(get_db)):
     
     # prompt user for date range
     # startDate = input("Enter a start date using this format YYYY-MM-DD: ")
@@ -26,10 +29,30 @@ def testing():
     # r = requests.get(f'https://api.nasa.gov/neo/rest/v1/neo/3542519?api_key={api_key}')    
     
     #get all asteroids within the default range
-    r = requests.get(f'https://api.nasa.gov/neo/rest/v1/feed?detailed=false&api_key={api_key}')    
-
-    print(r.status_code)  # check for any issues
+    # r = requests.get(f'https://api.nasa.gov/neo/rest/v1/feed?detailed=false&api_key={api_key}')    
+    endpoint = f'https://api.nasa.gov/neo/rest/v1/feed?detailed=false&api_key={api_key}'
+    # print(r.status_code)  # check for any issues
+    x: bool = True
+    while x:
+        try:
+            user = input("save: [Y]es or [N]o ?")
+        finally:
+            if user.lower() == ('y' or 'yes'):
+                x = False
+                
+                r = requests.get(endpoint)
+                y = SaveSearch(url=endpoint)
+                db.add(y)
+                db.commit()
+                
+            elif user.lower() == ('n' or 'no'):
+                x = False
+                return "success"
+            else:
+                print("Enter a valid response.")
     
+            
+        
     # print(NeoMetaData.model_validate(r.json()))
     
     # single asteroid
@@ -96,10 +119,24 @@ def get_individual_asteroid(id: int):
     return Neo.model_validate(r.json())
 
 
+# Search History: Let users save their asteroid searches (by date, id, etc.) to a database for quick access.
+'''
+ Instead of saving the output of a recent search, we can save the query itself to avoid cluttering our db.
+ 
+ Plan:
+ 1. add the post to db functionality to get requests
+ 2. it can be under any get request since we only need to save the url string with the query parameters
+ 3. create a new get request from the db instead of nasa api
+ 4. retrieve the url from db and run it with the requests module
+ 
+'''
+@app.get("/")
+def get_search(db: Session =  Depends(get_db)):
+    pass
+
 '''
 Optional Features:
 
-Search History: Let users save their asteroid searches (by date, id, etc.) to a database for quick access.
 
 Notifications: Send alerts or notifications when a significant asteroid is approaching Earth.
 
