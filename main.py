@@ -43,11 +43,18 @@ def testing():
 
 @app.get("/asteroids")
 def get_asteroids():
-    
-    
-    # fix on validation here so errors are handled gracefully
-    page = PositiveInt(input("Enter a page number (default: 0): "))
-    page_size = PositiveInt(input("Enter a page size from 1 - 20 (default: 20): "))
+    try: 
+        page = PositiveInt(input("Enter a page number (default: 0): "))
+    except ValueError: # validating input error
+        print("Invalid page number. Page value will default to 0.")
+        page = 0
+        
+    try:
+        page_size = PositiveInt(input("Enter a page size from 1 - 20 (default: 20): "))
+    except ValueError: # validating input error
+        page_size = 20
+        print("Invalid page size. Page size value will default to 20.")
+        
     try:
         r = requests.get(f'https://api.nasa.gov/neo/rest/v1/neo/browse?&page={page}&size={page_size}&api_key={api_key}')
         r.raise_for_status()
@@ -57,22 +64,21 @@ def get_asteroids():
 
     return BrowseNeos.model_validate(r.json())
 
-
 # Get all NEOs within a date range
 
 @app.get("/asteroids/date_range")
 def get_asteroids():
-        # prompt user for date range
-        # fix on validation here so errors are handled gracefully
+    
+    # prompt user for date range
 
     startDate = input("Enter a start date using this format YYYY-MM-DD: ")
     endDate = input("Enter an end date using this format YYYY-MM-DD: ")
+    
     try:
         r = requests.get(f'https://api.nasa.gov/neo/rest/v1/feed?start_date={startDate}&end_date={endDate}&api_key={api_key}')
         r.raise_for_status()
     except requests.exceptions.HTTPError: # catching 400
-        if r.status_code == 400:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Bad Request -- please enter a valid date range and try again.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Bad Request -- please enter a valid date range and try again.")
 
     return NeoMetaData.model_validate(r.json())
     

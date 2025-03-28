@@ -1,7 +1,7 @@
 from typing import List, Dict
 from datetime import date
 from pydantic_core import Url
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 class IgnoreExtraBase(BaseModel):
     model_config = {"extra": "ignore"} #ignore any field that is not part of the model
