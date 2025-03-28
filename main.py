@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from schemas import NeoMetaData, BrowseNeos, Neo
 from models import SaveSearch
 from database import get_db
+from save_search import save
 
 app =  FastAPI()
 
@@ -30,26 +31,26 @@ def testing(db: Session =  Depends(get_db)):
     
     #get all asteroids within the default range
     # r = requests.get(f'https://api.nasa.gov/neo/rest/v1/feed?detailed=false&api_key={api_key}')    
-    endpoint = f'https://api.nasa.gov/neo/rest/v1/feed?detailed=false&api_key={api_key}'
+    save(endpoint=f'https://api.nasa.gov/neo/rest/v1/feed?detailed=false&api_key={api_key}')
     # print(r.status_code)  # check for any issues
-    x: bool = True
-    while x:
-        try:
-            user = input("save: [Y]es or [N]o ?")
-        finally:
-            if user.lower() == ('y' or 'yes'):
-                x = False
+    # x: bool = True
+    # while x:
+    #     try:
+    #         user = input("save: [Y]es or [N]o ?")
+    #     finally:
+    #         if user.lower() == ('y' or 'yes'):
+    #             x = False
                 
-                r = requests.get(endpoint)
-                y = SaveSearch(url=endpoint)
-                db.add(y)
-                db.commit()
+    #             r = requests.get(endpoint)
+    #             y = SaveSearch(url=endpoint)
+    #             db.add(y)
+    #             db.commit()
                 
-            elif user.lower() == ('n' or 'no'):
-                x = False
-                return "success"
-            else:
-                print("Enter a valid response.")
+    #         elif user.lower() == ('n' or 'no'):
+    #             x = False
+    #             return "success"
+    #         else:
+    #             print("Enter a valid response.")
     
             
         
@@ -85,7 +86,7 @@ def get_asteroids(db: Session = Depends(get_db)):
         if r.status_code == 400:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
-    # save search feature -- MAKE IT A FUNCTION LATER !!     
+    # ----------------------------- save search feature -- MAKE IT A FUNCTION LATER !!     
     x: bool = True
     endpoint = f'https://api.nasa.gov/neo/rest/v1/neo/browse?&page={page}&size={page_size}&api_key={api_key}'
     while x:
@@ -195,18 +196,31 @@ def get_individual_asteroid(id: int, db: Session = Depends(get_db)):
  
  Mostly done. Need to make it a function then call from request.
 '''
-@app.get("/")
-def get_search(db: Session =  Depends(get_db)):
-    pass
 
+# done: Retrieve search history
+# additional feature: maybe don't save api key in db. Just reference var when making request.
+
+@app.get("/search_history")
+def get_search(db: Session =  Depends(get_db)):
+    # query db -- use db session
+    return db.query(SaveSearch).all()
+    # return all under search history table
+    
+    
 '''
 Optional Features:
 
-
 Notifications: Send alerts or notifications when a significant asteroid is approaching Earth.
+    ??
+    I guess use the NEO query date range (relevancy )to check if there are potentially hazardous asteroids == True then return those ?
+    
 
 Save info about a specific asteroid to a persistent database.
+    instead of saving search query, just save the json returned
 
 Update only the necessary fields for a specific asteroid.
+    once the previous feature is created then work on this one
+    
+Finally just implement soft delete and pagination
 
 '''
