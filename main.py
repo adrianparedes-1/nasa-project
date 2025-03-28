@@ -65,7 +65,7 @@ def testing(db: Session =  Depends(get_db)):
 # Get all NEOs
 
 @app.get("/asteroids")
-def get_asteroids():
+def get_asteroids(db: Session = Depends(get_db)):
     try: 
         page = PositiveInt(input("Enter a page number (default: 0): "))
     except ValueError: # validating input error
@@ -85,12 +85,32 @@ def get_asteroids():
         if r.status_code == 400:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
+    # save search feature -- MAKE IT A FUNCTION LATER !!     
+    x: bool = True
+    endpoint = f'https://api.nasa.gov/neo/rest/v1/neo/browse?&page={page}&size={page_size}&api_key={api_key}'
+    while x:
+        try:
+            user = input("save: [Y]es or [N]o ?")
+        finally:
+            if user.lower() == ('y' or 'yes'):
+                x = False
+                
+                r = requests.get(endpoint)
+                y = SaveSearch(url=endpoint)
+                db.add(y)
+                db.commit()
+                
+            elif user.lower() == ('n' or 'no'):
+                x = False
+            else:
+                print("Enter a valid response.")
+    
     return BrowseNeos.model_validate(r.json())
 
 # Get all NEOs within a date range
 
 @app.get("/asteroids/date_range")
-def get_asteroids():
+def get_asteroids(db: Session = Depends(get_db)):
     
     # prompt user for date range
 
@@ -103,18 +123,61 @@ def get_asteroids():
     except requests.exceptions.HTTPError: # catching 400
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Bad Request -- please enter a valid date range and try again.")
 
+
+
+# ----------------------------
+    x: bool = True
+    endpoint = f'https://api.nasa.gov/neo/rest/v1/feed?start_date={startDate}&end_date={endDate}&api_key={api_key}'
+    while x:
+        try:
+            user = input("save: [Y]es or [N]o ?")
+        finally:
+            if user.lower() == ('y' or 'yes'):
+                x = False
+                
+                r = requests.get(endpoint)
+                y = SaveSearch(url=endpoint)
+                db.add(y)
+                db.commit()
+                
+            elif user.lower() == ('n' or 'no'):
+                x = False
+            else:
+                print("Enter a valid response.")
+                
     return NeoMetaData.model_validate(r.json())
     
 
 # Get an individual NEO
 
 @app.get("/asteroid/{id}")
-def get_individual_asteroid(id: int):
+def get_individual_asteroid(id: int, db: Session = Depends(get_db)):
     try:
         r = requests.get(f'https://api.nasa.gov/neo/rest/v1/neo/{id}?api_key={api_key}')
-        print(r.raise_for_status())
+        #print(r.raise_for_status())
     except requests.exceptions.HTTPError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    
+    # ----------------------------
+    x: bool = True
+    endpoint = f'https://api.nasa.gov/neo/rest/v1/neo/{id}?api_key={api_key}'
+    while x:
+        try:
+            user = input("save: [Y]es or [N]o ?")
+        finally:
+            if user.lower() == ('y' or 'yes'):
+                x = False
+                
+                r = requests.get(endpoint)
+                y = SaveSearch(url=endpoint)
+                db.add(y)
+                db.commit()
+                
+            elif user.lower() == ('n' or 'no'):
+                x = False
+            else:
+                print("Enter a valid response.")
+    
         
     return Neo.model_validate(r.json())
 
@@ -129,6 +192,8 @@ def get_individual_asteroid(id: int):
  3. create a new get request from the db instead of nasa api
  4. retrieve the url from db and run it with the requests module
  
+ 
+ Mostly done. Need to make it a function then call from request.
 '''
 @app.get("/")
 def get_search(db: Session =  Depends(get_db)):

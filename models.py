@@ -18,6 +18,7 @@ class NeoMetaData(Base):
     id = mapped_column(Integer, primary_key=True)
     element_count = mapped_column(Integer)
     near_earth_objects = mapped_column(Integer)
+    search_history = mapped_column(Integer, ForeignKey('search_history.id'))
 
 
 class Neo(Base):
