@@ -4,10 +4,10 @@ from dotenv import load_dotenv
 import os
 from fastapi import FastAPI, Depends, status, HTTPException
 from sqlalchemy.orm import Session
-from schemas import NeoMetaData, BrowseNeos, Neo
+from schemas import NeoMetaData, BrowseNeos, Neo, UserInput
 from models import SaveSearch
-from database import get_db as sess
-from save_search import save as s
+from database import get_db
+from save_search import save
 
 app =  FastAPI()
 
@@ -23,19 +23,19 @@ def result_validation(result):
         return result
     
 @app.get("/test")
-def testing(db: Session =  Depends(sess)):
+def testing(db: Session =  Depends(get_db)):
     
     # single asteroid
     # return Neo.model_validate(r.json())
     
     #all asteroids
-    result = NeoMetaData.model_validate(s(f'https://api.nasa.gov/neo/rest/v1/feed?detailed=false&api_key={api_key}', db).json())
+    result = NeoMetaData.model_validate(save(f'https://api.nasa.gov/neo/rest/v1/feed?detailed=false&api_key={api_key}', db).json())
     return result
 
 # Get all NEOs
 
 @app.get("/asteroids")
-def get_asteroids(db: Session = Depends(sess)):
+def get_asteroids(db: Session = Depends(get_db)):
     try: 
         page = PositiveInt(input("Enter a page number (default: 0): "))
     except ValueError: # validating input error
@@ -56,7 +56,7 @@ def get_asteroids(db: Session = Depends(sess)):
         if r.status_code == 400:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     
-    result = BrowseNeos.model_validate(s(endpoint, db).json())
+    result = BrowseNeos.model_validate(save(endpoint, db).json())
     
     return result_validation(result)
 
@@ -64,7 +64,7 @@ def get_asteroids(db: Session = Depends(sess)):
 # Get all NEOs within a date range
 
 @app.get("/asteroids/date_range")
-def get_asteroids(db: Session = Depends(sess)):
+def get_asteroids(db: Session = Depends(get_db)):
     
     # prompt user for date range
     
@@ -79,7 +79,7 @@ def get_asteroids(db: Session = Depends(sess)):
     except rq.exceptions.HTTPError: # catching 400
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Bad Request -- please enter a valid date range and try again.")
     
-    result = NeoMetaData.model_validate(s(endpoint, db).json())
+    result = NeoMetaData.model_validate(save(endpoint, db).json())
     
     return result_validation(result)
 
@@ -89,7 +89,7 @@ def get_asteroids(db: Session = Depends(sess)):
 # Get an individual NEO
 
 @app.get("/asteroid/{id}")
-def get_individual_asteroid(id: int, db: Session = Depends(sess)):
+def get_individual_asteroid(id: int, db: Session = Depends(get_db)):
     
     endpoint = f'https://api.nasa.gov/neo/rest/v1/neo/{id}?api_key={api_key}'
     
@@ -100,7 +100,7 @@ def get_individual_asteroid(id: int, db: Session = Depends(sess)):
         if r.status_code == 400:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     
-    result = Neo.model_validate(s(endpoint, db).json())
+    result = Neo.model_validate(save(endpoint, db).json())
     
     return result_validation(result)
 
@@ -109,37 +109,25 @@ def get_individual_asteroid(id: int, db: Session = Depends(sess)):
 # Get search history
 
 @app.get("/search_history")
-def get_search_history(db: Session =  Depends(sess)):
+def get_search_history(db: Session =  Depends(get_db)):
     query = db.query(SaveSearch).all()
-
+    
     if query:
         return query
     else:
         raise ConnectionError
+
+# Run a specific search item from the search history
 
 @app.get("/search_history/{id}")
-def get_search(id: int, db: Session = Depends(sess)):
+def get_search(id: int, db: Session = Depends(get_db)):
     query = db.query(SaveSearch).filter(id == SaveSearch.id).first()
     
-    if query:
-        return query
-    else:
-        raise ConnectionError
-    
-'''
-Optional Features:
-
-Notifications: Send alerts or notifications when a significant asteroid is approaching Earth.
-    ??
-    I guess use the NEO query date range (relevancy )to check if there are potentially hazardous asteroids == True then return those ?
-    
-
-Save info about a specific asteroid to a persistent database.
-    instead of saving search query, just s the json returned
-
-Update only the necessary fields for a specific asteroid.
-    once the previous feature is created then work on this one
-    
-Finally just implement soft delete and pagination
-
-'''
+    try:
+        r = rq.get(query.url)
+        r.raise_for_status()
+    except rq.exceptions.HTTPError: # catching 400
+        if r.status_code == 400:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+            
+    return r.json()

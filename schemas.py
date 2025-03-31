@@ -62,4 +62,4 @@ class BrowseNeos(IgnoreExtraBase):
     near_earth_objects: List[Neo] # list of Neo objects
     
 class UserInput(IgnoreExtraBase):
-    endpoint: Url
+    url: Url

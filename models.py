@@ -29,6 +29,7 @@ class Neo(Base):
     size = mapped_column(Integer, ForeignKey('neo_size.id'))
     hazardous = mapped_column(Boolean, nullable=False)
     close_approach_data = mapped_column(Integer, ForeignKey('approach_data.id'))
+    search_history = mapped_column(Integer, ForeignKey('search_history.id'))
     created_at = mapped_column(DateTime(timezone=True), onupdate=sql.func.now())
 
     

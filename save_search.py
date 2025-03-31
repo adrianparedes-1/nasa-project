@@ -28,8 +28,8 @@ def save(endpoint: Url, db):
             if user.lower() == ('y' or 'yes'):
                 x = False
                 
-                validate_endpoint = SaveSearch(url=endpoint)
-                db.add(validate_endpoint)
+                get_url = SaveSearch(url=endpoint)
+                db.add(get_url)
                 db.commit()
                 
             elif user.lower() == ('n' or 'no'):
