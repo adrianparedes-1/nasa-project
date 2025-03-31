@@ -1,11 +1,9 @@
 from pydantic_core import Url
-import requests
-from fastapi import Depends
-from database import get_db
-from sqlalchemy.orm import Session
+import requests as rq
 from models import SaveSearch
+from fastapi import HTTPException, status
 
-# there is still a problem here 
+# there is still a problem here --- fixed!
 
 '''
 this is the solution:
@@ -16,21 +14,27 @@ https://github.com/fastapi/fastapi/issues/1693#issuecomment-665833384
 
 def save(endpoint: Url, db):
     x: bool = True
+    # check if it's a valid request before asking to save search
+    try:
+        r = rq.get(endpoint)
+        r.raise_for_status()
+    except rq.exceptions.HTTPError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    
     while x:
         try:
-            user = input("save: [Y]es or [N]o ?")
+            user = input("Do you want to save this search? : [Y]es or [N]o ? ")
         finally:
             if user.lower() == ('y' or 'yes'):
                 x = False
                 
-                r = requests.get(endpoint)
-                y = SaveSearch(url=endpoint)
-                db.add(y)
+                validate_endpoint = SaveSearch(url=endpoint)
+                db.add(validate_endpoint)
                 db.commit()
                 
             elif user.lower() == ('n' or 'no'):
                 x = False
-                return "success"
+                
             else:
                 print("Enter a valid response.")
 
