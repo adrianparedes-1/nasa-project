@@ -31,7 +31,7 @@ def testing(db: Session =  Depends(get_db)):
     
     #get all asteroids within the default range
     # r = requests.get(f'https://api.nasa.gov/neo/rest/v1/feed?detailed=false&api_key={api_key}')    
-    save(endpoint=f'https://api.nasa.gov/neo/rest/v1/feed?detailed=false&api_key={api_key}')
+    # save(f'https://api.nasa.gov/neo/rest/v1/feed?detailed=false&api_key={api_key}', db)
     # print(r.status_code)  # check for any issues
     # x: bool = True
     # while x:
@@ -60,7 +60,7 @@ def testing(db: Session =  Depends(get_db)):
     # return Neo.model_validate(r.json())
     
     #all asteroids
-    return NeoMetaData.model_validate(r.json())
+    return NeoMetaData.model_validate(save(f'https://api.nasa.gov/neo/rest/v1/feed?detailed=false&api_key={api_key}', db).json())
 
 
 # Get all NEOs
@@ -85,28 +85,10 @@ def get_asteroids(db: Session = Depends(get_db)):
     except requests.exceptions.HTTPError: # catching 400
         if r.status_code == 400:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-
-    # ----------------------------- save search feature -- MAKE IT A FUNCTION LATER !!     
-    x: bool = True
+   
     endpoint = f'https://api.nasa.gov/neo/rest/v1/neo/browse?&page={page}&size={page_size}&api_key={api_key}'
-    while x:
-        try:
-            user = input("save: [Y]es or [N]o ?")
-        finally:
-            if user.lower() == ('y' or 'yes'):
-                x = False
-                
-                r = requests.get(endpoint)
-                y = SaveSearch(url=endpoint)
-                db.add(y)
-                db.commit()
-                
-            elif user.lower() == ('n' or 'no'):
-                x = False
-            else:
-                print("Enter a valid response.")
     
-    return BrowseNeos.model_validate(r.json())
+    return BrowseNeos.model_validate(save(endpoint, db).json())
 
 # Get all NEOs within a date range
 
@@ -127,26 +109,9 @@ def get_asteroids(db: Session = Depends(get_db)):
 
 
 # ----------------------------
-    x: bool = True
     endpoint = f'https://api.nasa.gov/neo/rest/v1/feed?start_date={startDate}&end_date={endDate}&api_key={api_key}'
-    while x:
-        try:
-            user = input("save: [Y]es or [N]o ?")
-        finally:
-            if user.lower() == ('y' or 'yes'):
-                x = False
                 
-                r = requests.get(endpoint)
-                y = SaveSearch(url=endpoint)
-                db.add(y)
-                db.commit()
-                
-            elif user.lower() == ('n' or 'no'):
-                x = False
-            else:
-                print("Enter a valid response.")
-                
-    return NeoMetaData.model_validate(r.json())
+    return NeoMetaData.model_validate(save(endpoint, db).json())
     
 
 # Get an individual NEO
@@ -159,28 +124,9 @@ def get_individual_asteroid(id: int, db: Session = Depends(get_db)):
     except requests.exceptions.HTTPError:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     
-    # ----------------------------
-    x: bool = True
     endpoint = f'https://api.nasa.gov/neo/rest/v1/neo/{id}?api_key={api_key}'
-    while x:
-        try:
-            user = input("save: [Y]es or [N]o ?")
-        finally:
-            if user.lower() == ('y' or 'yes'):
-                x = False
-                
-                r = requests.get(endpoint)
-                y = SaveSearch(url=endpoint)
-                db.add(y)
-                db.commit()
-                
-            elif user.lower() == ('n' or 'no'):
-                x = False
-            else:
-                print("Enter a valid response.")
-    
         
-    return Neo.model_validate(r.json())
+    return Neo.model_validate(save(endpoint, db).json())
 
 
 # Search History: Let users save their asteroid searches (by date, id, etc.) to a database for quick access.

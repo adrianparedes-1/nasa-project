@@ -14,7 +14,7 @@ https://github.com/fastapi/fastapi/issues/1693#issuecomment-665833384
 
 '''
 
-def save(endpoint: Url, db: Session = Depends(get_db)):
+def save(endpoint: Url, db):
     x: bool = True
     while x:
         try:
@@ -33,3 +33,7 @@ def save(endpoint: Url, db: Session = Depends(get_db)):
                 return "success"
             else:
                 print("Enter a valid response.")
+
+    return r
+
+    
