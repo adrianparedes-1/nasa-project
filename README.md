@@ -2,9 +2,10 @@
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)](https://www.postgresql.org/)
+[![Alembic](https://img.shields.io/badge/Alembic-Migrations-orange)](https://alembic.sqlalchemy.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This project uses NASA's [Asteroids - NeoWs](https://api.nasa.gov/) (Near Earth Object Web Service) API to retrieve and store information about asteroids approaching Earth. The goal was to gain hands-on experience working with **FastAPI**, **SQLAlchemy**, **Pydantic**, and **PostgreSQL**.
+This project utilizes NASA's [Asteroids - NeoWs](https://api.nasa.gov/) (Near Earth Object Web Service) API to retrieve and store information about asteroids approaching Earth. The goal was to gain hands-on experience working with **FastAPI**, **SQLAlchemy**, **Pydantic**, **PostgreSQL**, and **Alembic** for database migrations.
 
 ---
 
@@ -12,9 +13,10 @@ This project uses NASA's [Asteroids - NeoWs](https://api.nasa.gov/) (Near Earth 
 
 - How to build RESTful APIs using FastAPI
 - Modeling complex and dynamic JSON schemas with Pydantic
-- Persisting data from external APIs into a local PostgreSQL database
-- Clean architecture and modular project structure
-- Error handling and validation for external data
+- Persisting external API data into a PostgreSQL database
+- Implementing database migrations with Alembic
+- Structuring a clean and modular FastAPI project
+- Error handling and data validation for external APIs
 
 ---
 
@@ -26,6 +28,7 @@ This project uses NASA's [Asteroids - NeoWs](https://api.nasa.gov/) (Near Earth 
 | SQLAlchemy  | ORM for database modeling and queries      |
 | Pydantic    | Data validation and parsing with Python    |
 | PostgreSQL  | Relational database for persistent storage |
+| Alembic     | Database migration tool for SQLAlchemy     |
 | NASA NeoWs  | External REST API for asteroid data        |
 
 ---
@@ -36,6 +39,7 @@ This project uses NASA's [Asteroids - NeoWs](https://api.nasa.gov/) (Near Earth 
 - 📅 Search asteroids by approach date
 - 🔎 View detailed info for specific objects
 - 💾 Save queries to a PostgreSQL database
+- 🔄 Database migrations with Alembic
 - ✅ Includes data validation & basic error handling
 
 ---
@@ -55,13 +59,21 @@ cd nasa-project
 pip install -r requirements.txt
 ```
 
-### 3. Run the API server
+### 3. Set up the database
+
+Before running the API, apply database migrations using Alembic:
+
+```bash
+alembic upgrade head
+```
+
+### 4. Run the API server
 
 ```bash
 uvicorn main:app --reload
 ```
 
-### 4. Open API Docs
+### 5. Open API Docs
 
 Visit the interactive Swagger docs:  
 📍 `http://localhost:8000/docs`
@@ -77,8 +89,10 @@ nasa-api-project/
 │   ├── main.py              # FastAPI app entry point
 │   ├── models.py            # SQLAlchemy models
 │   ├── schemas.py           # Pydantic schemas
-|   ├── requirements.txt     # Packages
-│   └── database.py          # DB connection setup 
+│   ├── database.py          # DB connection setup
+│   ├── alembic/             # Alembic migrations
+│   ├── migrations/          # Database migration scripts
+│   ├── requirements.txt     # Packages
 │
 └── README.md
 ```
@@ -87,9 +101,9 @@ nasa-api-project/
 
 ## 🔗 Example Endpoints
 
-- `/asteroid/{id}`
-- `/asteroids`
-- `/asteroids/date_range`
+- `/asteroid/{id}` : Retrieve information about a specific asteroid
+- `/asteroids` : Retrieve paginated asteroid data
+- `/asteroids/date_range` : Fetch Near-Earth Objects within a given date range
 
 ---
 
@@ -103,3 +117,4 @@ nasa-api-project/
 ## 📄 License
 
 This project is licensed under the MIT License.
+

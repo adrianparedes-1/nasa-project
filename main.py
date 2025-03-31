@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 from fastapi import FastAPI, Depends, status, HTTPException
 from sqlalchemy.orm import Session
-from schemas import NeoMetaData, BrowseNeos, Neo, UserInput
+from schemas import NeoMetaData, BrowseNeos, Neo
 from models import SaveSearch
 from database import get_db
 from save_search import save
